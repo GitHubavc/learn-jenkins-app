@@ -41,15 +41,17 @@ pipeline {
                     agent{
                          docker{
                                     image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                                    args '--ipc=host'
                                     reuseNode true
                          }
                      }
                     steps{
                         sh '''
-                            npm install  serve
-                            node_modules/.bin/serve -s build
-                            sleep 10
-                            npx playwright test
+                             rm -rf node_modules package-lock.json  # Clean up previous installations
+                             npm install --force                   # Install dependencies with force
+                             npx serve -s build &                  # Start the server in the background
+                             sleep 10                               # Give the server time to start
+                             npx playwright test                   # Run Playwright tests
                         '''
                     }
                 }
